@@ -2,10 +2,14 @@
 
 "use strict";
 
+import { AsyncSemaphore } from "@asanrom/async-tools";
 import { FindCursor, MongoClient } from "mongodb";
 import { Readable } from "stream";
 import { Config } from "./config";
 import { Feature, InstanceType, QueryTree, sanitizeQueryTree, toMongoFilter, turnInto } from "./utils/deepint-sources";
+import { Request } from "./utils/request";
+
+const DEEPINT_UPDATE_INSTANCES_LIMIT = 100;
 
 export class DataSource {
     public static instance: DataSource;
@@ -24,6 +28,12 @@ export class DataSource {
     public url: string;
     public mongoClient: MongoClient;
 
+    public updateSem: AsyncSemaphore;
+    public updateQueue: InstanceType[][];
+    public requiredUpdate: boolean;
+
+    public closed: boolean;
+
     constructor() {
         this.fields = Config.getInstance().sourceFeatures.map((f, i) => {
             return {
@@ -37,6 +47,76 @@ export class DataSource {
         this.mongoClient = new MongoClient(this.url, {
             forceServerObjectId: true,
         });
+        this.updateQueue = [];
+        this.updateSem = new AsyncSemaphore(0);
+        this.requiredUpdate = false;
+
+        this.closed = false;
+    }
+
+    private async sendInstancesToDeepIntelligence(instances: InstanceType[][]): Promise<void> {
+        const url = (new URL("external/source/update", Config.getInstance().deepintURL)).toString();
+        return new Promise<void>((resolve, reject) => {
+            Request.post(
+                url,
+                {
+                    headers: {
+                        'x-public-key': Config.getInstance().pubKey,
+                        'x-secret-key': Config.getInstance().secretKey,
+                    },
+                    json: instances,
+                },
+                (err, response, body) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    if (response.statusCode !== 200) {
+                        return reject(new Error("Status code: " + response.statusCode));
+                    }
+                    resolve();
+                },
+            )
+        });
+    }
+
+    public async runUpdateService() {
+        while (!this.closed) {
+            await this.updateSem.acquire();
+
+            if (!this.requiredUpdate && this.updateQueue.length === 0) {
+                continue;
+            }
+
+            const instancesToPush: InstanceType[][] = [];
+
+            while (instancesToPush.length < DEEPINT_UPDATE_INSTANCES_LIMIT && this.updateQueue.length > 0) {
+                instancesToPush.push(this.updateQueue.shift());
+            }
+
+            this.requiredUpdate = false;
+
+            let done = false;
+
+            while(!done) {
+                try {
+                    await this.sendInstancesToDeepIntelligence(instancesToPush);
+                    done = true;
+                } catch (ex) {
+                    console.error(ex);
+                }
+
+                if (!done) {
+                    // If failure, wait 5 seconds to retry
+                    await new Promise((resolve) => {
+                        setTimeout(resolve, 5000);
+                    });
+                }
+            }
+
+            if (Config.getInstance().logEvents) {
+                console.log(`[${(new Date()).toISOString()}] [UPDATE] External source updated.`);
+            }
+        }
     }
 
     async connect(): Promise<MongoClient> {
@@ -63,6 +143,57 @@ export class DataSource {
             }
             return !!this.fields[a];
         });
+    }
+
+    public sanitizeInstances(instances: any[]): InstanceType[][] {
+        if (!Array.isArray(instances)) {
+            return [];
+        }
+        return instances.map(i => {
+            const instance: InstanceType[] = [];
+            let row = i;
+            if (typeof i !== "object") {
+                row = Object.create(null);
+            }
+
+            for (const feature of this.fields) {
+                instance.push(turnInto(row[feature.name], feature.type));
+            }
+
+            return instance;
+        });
+    }
+
+    /**
+     * Adds instances to the collection
+     * @param instances Instances
+     */
+    public async pushInstances(instances: InstanceType[][]): Promise<void> {
+        // Insert into mongo
+        const mongoInstances = instances.map(i => {
+            const row: any = Object.create(null);
+            for (const feature of this.fields) {
+                row[feature.name] = i[feature.index];
+            }
+            return row;
+        });
+
+        const client = await this.connect()
+        const db = client.db().collection(Config.getInstance().mongoCollection);
+        await db.insertMany(mongoInstances);
+
+        // Add to queue
+        instances.forEach(i => {
+            this.updateQueue.push(i)
+        });
+    }
+
+    /**
+     * Notices a source update
+     */
+    public noticeUpdate() {
+        this.requiredUpdate = true;
+        this.updateSem.release();
     }
 
     /**

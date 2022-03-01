@@ -39,6 +39,8 @@ export class Config {
     public mongoURI: string;
     public mongoCollection: string;
 
+    public deepintURL: string;
+
     public sourceFeatures: string[];
     public sourceFeaturesTypes: FeatureType[];
 
@@ -61,6 +63,8 @@ export class Config {
         this.secretKey = process.env.SOURCE_SECRET_KEY || "";
         this.mongoURI = process.env.MONGO_URI || "";
         this.mongoCollection = process.env.MONGO_COLLECTION || "";
+
+        this.deepintURL = process.env.DEEPINT_API_URL || "https://app.deepint.net/api/v1/";
 
         this.sourceFeatures = (process.env.SOURCE_FIELDS || "").split(",").filter(a => !!a);
         this.sourceFeaturesTypes = (process.env.SOURCE_FIELDS_TYPES || "").split(",").filter(a => !!a).map(function (a: string): FeatureType {

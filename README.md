@@ -38,6 +38,7 @@ In order to configure this module, you have to set the following environment var
 | SSL_KEY | Path to SSL private key. Required for HTTPS to work |
 | LOG_MODE | Log Mode. values: DEFAULT, SILENT, DEBUG |
 | API_DOCS | Set it to `YES` to generate Swagger api documentation in the `/api-docs/` path. |
+| DEEPINT_API_URL | Deep Intelligence API URL, by default is `https://app.deepint.net/api/v1/` |
 
 In order to configure the source, set the following variables:
 

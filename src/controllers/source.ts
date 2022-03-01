@@ -3,7 +3,6 @@
 "use strict";
 
 import Express from "express";
-import { features } from "process";
 import { Config } from "../config";
 import { Controller } from "../controller";
 import { DataSource } from "../source";

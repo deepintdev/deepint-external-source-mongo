@@ -10,7 +10,9 @@ import { DataSource } from './source';
 function main() {
     Config.getInstance();
 
-    DataSource.getInstance();
+    DataSource.getInstance().runUpdateService().catch(err => {
+        console.error(err);
+    });
 
     // Web app
     const app = new Application();

@@ -28,6 +28,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "@asanrom/async-tools": "^0.0.2",
     "@asanrom/express-swagger-generator": "^2.1.1",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.0",
