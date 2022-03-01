@@ -1,0 +1,39 @@
+{
+  "name": "deepint-external-source-mongo",
+  "version": "1.0.0",
+  "description": "Mongo DB external source for Deep Intelligence",
+  "main": "dist/index.js",
+  "scripts": {
+    "watch": "npm run watch:ts",
+    "watch:ts": "npm run build:ts -- --watch --diagnostics",
+    "prebuild": "npm run lint",
+    "compile": "tsc --pretty",
+    "build": "rimraf dist && tsc --pretty",
+    "lint": "eslint --fix src/**/*.ts",
+    "start": "node dist/index.js"
+  },
+  "engines": {
+    "node": ">= 12.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.17",
+    "@typescript-eslint/eslint-plugin": "^5.11.0",
+    "@typescript-eslint/parser": "^5.11.0",
+    "eslint": "^8.8.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "@asanrom/express-swagger-generator": "^2.1.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "express-async-errors": "^3.1.1",
+    "form-data": "^4.0.0",
+    "mongodb": "^4.4.0"
+  }
+}

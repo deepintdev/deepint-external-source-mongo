@@ -1,0 +1,17 @@
+# .gitignore file
+
+# Ignore downloaded dependencies
+
+node_modules
+
+# Ignore compiled files
+
+dist
+
+# Ignore temp files
+
+temp
+
+# Ignore .env
+
+.env
