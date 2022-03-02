@@ -207,9 +207,7 @@ export class DataSource {
         const client = await this.connect()
         const db = client.db().collection(Config.getInstance().mongoCollection);
 
-        const cursor: FindCursor<any> = db.find(cond1);
-
-        const count = await cursor.count();
+        const count = await db.countDocuments(cond1);
 
         return count;
     }
@@ -248,6 +246,10 @@ export class DataSource {
         }
 
         const cond1 = toMongoFilter(this.fields, filter);
+
+        if (Config.getInstance().logDebug) {
+            console.log("[QUERY] [MONGO] " + JSON.stringify(cond1));
+        }
 
         const client = await this.connect()
         const db = client.db().collection(Config.getInstance().mongoCollection);

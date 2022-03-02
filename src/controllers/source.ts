@@ -157,6 +157,10 @@ export class StatusController extends Controller {
 
         let requiresComma = false;
 
+        if (Config.getInstance().logDebug) {
+            console.log("[QUERY] [FILTER] " + JSON.stringify(filter));
+        }
+
         await DataSource.getInstance().query(filter, order, dir, skip, limit, projection, (features) => {
             const featuresJSON = features.map(a => {
                 return {
