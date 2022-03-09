@@ -312,27 +312,14 @@ export class DataSource {
 
         query = (query || "").toLowerCase();
 
-        const mongoProjection = Object.create(null);
-        mongoProjection[fieldName] = 1;
-
-        const mongoSort = Object.create(null);
-        mongoSort[fieldName] = 1;
-
         const client = await this.connect();
 
         const db = client.db().collection(Config.getInstance().mongoCollection);
-        let cursor: FindCursor<any> = db.find(cond1);
 
-        cursor = cursor.sort(mongoSort);
-        cursor = cursor.project(mongoProjection);
-        cursor = cursor.limit(128);
+        const values = (await db.distinct(fieldName, cond1)).map(a => a + "").sort().filter(val => {
+            return (!query || (val + "").toLowerCase().startsWith(query))
+        }).slice(0, 128);
 
-        const docs = await cursor.toArray();
-
-        return docs.filter(doc => {
-            return !!doc[fieldName];
-        }).map(doc => {
-            return (doc[fieldName] || "") + "";
-        });
+        return values;
     }
 }
