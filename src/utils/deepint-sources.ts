@@ -1,4 +1,4 @@
-// Deepint sources utils
+// AIR-Core (formerly Deep Intelligence) external sources utils
 
 "use strict";
 

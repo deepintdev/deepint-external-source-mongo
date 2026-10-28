@@ -1,6 +1,6 @@
-# Deep Intelligence External source: Mongo DB
+# AIR-Core External source: Mongo DB
 
-This is an external source to connect a Mongo DB collection to a Deep Intelligence.
+This is an external source to connect a Mongo DB collection to an [AIR-Core](https://app.air-core.io) (formerly Deep Intelligence) data source.
 
 ## Installation
 
@@ -38,7 +38,8 @@ In order to configure this module, you have to set the following environment var
 | SSL_KEY | Path to SSL private key. Required for HTTPS to work |
 | LOG_MODE | Log Mode. values: DEFAULT, SILENT, DEBUG |
 | API_DOCS | Set it to `YES` to generate Swagger api documentation in the `/api-docs/` path. |
-| DEEPINT_API_URL | Deep Intelligence API URL, by default is `https://app.deepint.net/api/v1/` |
+| AIRCORE_API_URL | AIR-Core API URL, by default is `https://app.air-core.io/api/v1/`. Takes precedence over `DEEPINT_API_URL` |
+| DEEPINT_API_URL | Legacy name of `AIRCORE_API_URL`, still supported |
 
 In order to configure the source, set the following variables:
 
