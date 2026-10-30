@@ -43,7 +43,7 @@ export class StatusController extends Controller {
     }
 
     /**
-     * Notices Deep Intelligence of a source update. Call this method if you updated the mongo database without using this API.
+     * Notices AIR-Core of a source update. Call this method if you updated the mongo database without using this API.
      * @route POST /update/notice
      * @group update - Source updating methods
      * @param {string} x-public-key.header.required - Source public key

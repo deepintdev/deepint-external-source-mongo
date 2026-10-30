@@ -1,7 +1,7 @@
 {
   "name": "deepint-external-source-mongo",
-  "version": "1.0.0",
-  "description": "Mongo DB external source for Deep Intelligence",
+  "version": "1.1.0",
+  "description": "Mongo DB external source for AIR-Core",
   "main": "dist/index.js",
   "scripts": {
     "watch": "npm run watch:ts",
