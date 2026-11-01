@@ -1,6 +1,8 @@
 # AIR-Core External source: Mongo DB
 
-This is an external source to connect a Mongo DB collection to an [AIR-Core](https://app.air-core.io) (formerly Deep Intelligence) data source.
+This is an external source to connect a Mongo DB collection to an [AIR-Core](https://app.air-core.io) data source.
+
+AIR-Core is the data and AI platform maintained by [AIR Institute](https://air-institute.com).
 
 ## Installation
 
